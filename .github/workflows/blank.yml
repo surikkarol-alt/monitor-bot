@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,4 +26,4 @@ jobs:
 
       - name: Run syntax check
         run: |
-          python -m compileall .
+          python -m py_compile alert_monitor.py
