@@ -1,0 +1,9 @@
+pycache/
+*.pyc
+venv/
+.env
+.env.*
+# Docker build artifacts
+*.tar
+# Logs
+*.log

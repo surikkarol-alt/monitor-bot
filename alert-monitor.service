@@ -1,0 +1,11 @@
+[Unit]
+Description=Alert Monitor Bot
+After=network.target
+
+[Service]
+WorkingDirectory=/home/sharif/monitor_bot
+ExecStart=/home/sharif/monitor_bot/venv/bin/python3 /home/sharif/monitor_bot/alert_monitor.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

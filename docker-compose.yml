@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  alert-monitor:
+    build: .
+    container_name: alert-monitor-compose
+    volumes:
+      - ./logs:/app/logs
+    working_dir: /app
+    env_file:
+      - .env
+    command: python3 alert_monitor.py
+    restart: unless-stopped
