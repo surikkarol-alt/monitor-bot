@@ -1,0 +1,31 @@
+name: CI/CD MonitorBot
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build Docker image
+        run: docker build -t monitorbot-image .
+
+      - name: Run container
+        run: docker run --rm \
+              -e BOT_TOKEN=${{ secrets.BOT_TOKEN }} \
+              -e CHAT_ID=${{ secrets.CHAT_ID }} \
+              monitorbot-image
