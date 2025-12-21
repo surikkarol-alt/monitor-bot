@@ -1,51 +1,41 @@
 name: CI/CD MonitorBot
+
 on:
   workflow_dispatch:
   push:
     branches: [ "main" ]
-    
-on:
-  push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
   ci-cd:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2️⃣ Setup Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
 
-      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: pip install --no-cache-dir -r requirements.txt
 
-      # 4️⃣ Linting
       - name: Lint code with flake8
         run: |
           pip install flake8
           flake8 .
 
-      # 5️⃣ Run tests (если есть тесты)
       - name: Run tests
         run: |
           pip install pytest
           pytest || echo "Tests failed but continuing workflow"
 
-      # 6️⃣ Build Docker image
       - name: Build Docker image
         run: docker build -t monitorbot-image .
 
-      # 7️⃣ Create Docker Compose file dynamically
       - name: Create docker-compose.override.yml
         run: |
           echo "version: '3.9'" > docker-compose.override.yml
@@ -59,10 +49,8 @@ jobs:
           echo "      - ./logs:/app/logs" >> docker-compose.override.yml
           echo "    restart: always" >> docker-compose.override.yml
 
-      # 8️⃣ Run container via Docker Compose
       - name: Run Docker Compose
         run: docker-compose -f docker-compose.override.yml up -d
 
-      # 9️⃣ Show running containers
       - name: Show running containers
         run: docker ps
