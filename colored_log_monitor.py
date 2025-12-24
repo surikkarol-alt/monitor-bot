@@ -1,5 +1,4 @@
 import time
-from colorama import Fore, Style, init
 
 # Инициализация цветного вывода (для Windows/Linux)
 init(autoreset=True)
