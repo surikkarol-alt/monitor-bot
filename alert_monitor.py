@@ -61,6 +61,5 @@ def monitor():
                         last_sent[keyword] = now
 
 
-if __name__ == "__main__":
+if name == "main":
     monitor()
-
