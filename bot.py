@@ -1,6 +1,10 @@
+import time
+import logging
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
 
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
 
 TOKEN = "8459636192:AAEcNtQw7-G1YipY3MLhbRkInuPk0zyllrI"
 
@@ -32,28 +36,8 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text("Не понимаю. Выбери кнопку.")
 
-# ---------- MAIN ----------
-def main():
-    app = Application.builder().token(TOKEN).build()
-
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_buttons))
-
-    app.run_polling()
-
-
-if __name__ == "__main__":
-    main()
-
-
-# alerting_utils.py  (примерный файл)
-import time
-import logging
-
-# cooldown seconds между сообщениями в один чат
-COOLDOWN = 30  # например 30 секунд
-
-# dict last_sent[chat_id] = timestamp
+# ---------- ФУНКЦИИ ОПОВЕЩЕНИЯ (COOLDOWN) ----------
+COOLDOWN = 30
 last_sent = {}
 
 def can_send(chat_id):
@@ -64,22 +48,16 @@ def can_send(chat_id):
 def mark_sent(chat_id):
     last_sent[chat_id] = time.time()
 
-def send_alert(bot, chat_id, text, parse_mode=None):
-    """
-    Безопасно отправляем — проверяем таймаут.
-    bot: объект telegram.Bot или telegram.ext.Bot
-    chat_id: int
-    text: str
-    """
-    try:
-        if not can_send(chat_id):
-            logging.info(f"Throttle: skip sending message to {chat_id}")
-            return False
-        # если используешь синхронный интерфейс:
-        bot.send_message(chat_id=chat_id, text=text, parse_mode=parse_mode)
-        mark_sent(chat_id)
-        logging.info(f"Sent alert to {chat_id}")
-        return True
-    except Exception as e:
-        logging.exception("Failed to send alert")
-        return False
+# ---------- MAIN ----------
+def main():
+    app = Application.builder().token(TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_buttons))
+
+    print("Бот запущен...")
+    app.run_polling()
+
+
+if __name__ == "__main__":
+    main()
