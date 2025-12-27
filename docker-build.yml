@@ -34,13 +34,13 @@ jobs:
     needs: build-and-push
     steps:
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.1.0 # Используй v1.1.0
+        uses: appleboy/ssh-action@v1.1.0 # Обязательно v1.1.0
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          port: 80
-          fingerprint: "" # Это позволит подключиться через туннель без ошибок
+          port: 22
+          fingerprint: "" # Это заменяет ручной ввод "yes" в терминале
           script: |
             cd ~/monitor_bot
             docker compose pull
