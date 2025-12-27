@@ -33,7 +33,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          port: 80
+          port: 22
           debug: true # ПОКАЖЕТ ВСЕ ДЕТАЛИ
           fingerprint: "" # УБЕРЕТ ВОПРОСЫ БЕЗОПАСНОСТИ
           script: |
