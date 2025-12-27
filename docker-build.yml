@@ -39,7 +39,8 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          port: 80 # Оставляем 80 для туннеля
+          port: 80 # Для Serveo
+          fingerprint: "" # Игнорировать проверку безопасности туннеля
           script: |
             cd ~/monitor_bot
             docker compose pull
