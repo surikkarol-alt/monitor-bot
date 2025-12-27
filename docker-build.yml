@@ -30,3 +30,19 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/monitor-bot:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push # Запускать только после успешной сборки
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 80 # Оставляем 80, если используешь Serveo/Localtunnel
+          script: |
+            cd ~/monitor-bot
+            docker compose pull
+            docker compose up -d
