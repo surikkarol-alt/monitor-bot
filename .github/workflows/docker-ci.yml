@@ -30,9 +30,9 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.1.0
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.SERVER_HOST }} # Изменил на твоё имя из списка секретов
+          username: ${{ secrets.SERVER_USER }} # Изменил на твоё имя из списка секретов
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # Изменил на твоё имя из списка секретов
           port: 80
           fingerprint: ""
           script: |
