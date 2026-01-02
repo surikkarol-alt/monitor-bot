@@ -28,14 +28,13 @@ jobs:
     needs: build-and-push
     steps:
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.1.0 # ОБНОВЛЕНО
+        uses: appleboy/ssh-action@v1.1.0
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: 80
-          debug: true # ПОКАЖЕТ ВСЕ ДЕТАЛИ
-          fingerprint: "" # УБЕРЕТ ВОПРОСЫ БЕЗОПАСНОСТИ
+          fingerprint: ""
           script: |
             cd ~/monitor_bot
             docker compose pull
