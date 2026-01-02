@@ -1,45 +1,42 @@
-name: Docker CI/CD
+name: Publish Docker image
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ['main']
 
 jobs:
-  # Часть 1: Сборка и отправка в Docker Hub (уже работает!)
   build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push
-        uses: docker/build-push-action@v5
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/monitorbot:latest
+          tags: ghcr.io/${{ github.repository_owner }}/monitor-bot:latest
 
-  # Часть 2: Деплой на твой сервер
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
     steps:
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.1.0 # ОБНОВЛЕНО
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 80
+          debug: true # ПОКАЖЕТ ВСЕ ДЕТАЛИ
+          fingerprint: "" # УБЕРЕТ ВОПРОСЫ БЕЗОПАСНОСТИ
           script: |
-            # Переходим в папку с ботом
             cd ~/monitor_bot
-            # Скачиваем свежий образ из Docker Hub
             docker compose pull
-            # Перезапускаем контейнеры в фоновом режиме
             docker compose up -d
