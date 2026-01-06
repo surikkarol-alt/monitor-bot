@@ -13,14 +13,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -35,19 +33,17 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.1.0
         with:
-          # Используем именно те названия, которые у тебя в GitHub Secrets
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 80
-          fingerprint: "" # Это уберет ошибку "handshake failed", которую мы видели
-          command_timeout: 15m
+          fingerprint: ""
+          # Увеличиваем время ожидания для туннеля
+          command_timeout: 30m
+          proxy_timeout: 30m
+          script_stop: true
           script: |
-            # Переходим в папку с ботом
             cd ~/monitor_bot
-            # Останавливаем старый контейнер
             docker compose down || true
-            # Загружаем новый образ из GitHub Registry
             docker compose pull
-            # Запускаем обновленного бота
             docker compose up -d
