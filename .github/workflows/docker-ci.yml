@@ -4,6 +4,7 @@ on:
   push:
     branches: ['main']
 
+# Даем права на запись образа, которые ты включил в настройках
 permissions:
   contents: read
   packages: write
@@ -24,6 +25,7 @@ jobs:
         with:
           context: .
           push: true
+          # Используем lowercase для безопасности тегов
           tags: ghcr.io/${{ github.repository_owner }}/monitor-bot:latest
 
   deploy:
@@ -35,9 +37,9 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          # -T отключает запрос терминала
-          # -o StrictHostKeyChecking=no позволяет подключаться к меняющимся адресам туннеля
-          ssh -T -i ~/.ssh/id_rsa -p 80 -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+          # Флаг -T отключает запрос терминала
+          # Флаг -o ConnectTimeout=60 не дает соединению сразу оборваться
+          ssh -T -i ~/.ssh/id_rsa -p 80 -o StrictHostKeyChecking=no -o ConnectTimeout=60 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
             cd ~/monitor_bot
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker compose down || true
