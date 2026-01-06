@@ -1,4 +1,4 @@
-name: Publish Docker image
+name: Docker CI/CD
 
 on:
   push:
@@ -35,18 +35,19 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.1.0
         with:
+          # Используем именно те названия, которые у тебя в GitHub Secrets
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 80
-          fingerprint: "" # Игнорирует проверку ключа хоста, что критично для туннелей
-          command_timeout: 10m
+          fingerprint: "" # Это уберет ошибку "handshake failed", которую мы видели
+          command_timeout: 15m
           script: |
-            # Переходим в папку с проектом
+            # Переходим в папку с ботом
             cd ~/monitor_bot
-            # Останавливаем старые контейнеры и удаляем их
-            docker compose down
-            # Скачиваем обновленный образ
+            # Останавливаем старый контейнер
+            docker compose down || true
+            # Загружаем новый образ из GitHub Registry
             docker compose pull
-            # Запускаем бота в фоновом режиме
+            # Запускаем обновленного бота
             docker compose up -d
