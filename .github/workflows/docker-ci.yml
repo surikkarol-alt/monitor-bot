@@ -11,16 +11,13 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+      - uses: docker/build-push-action@v5
         with:
           context: .
           push: true
@@ -36,12 +33,11 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 80
+          port: 22 # У localtunnel обычно стандартный 22 порт через их прокси
           fingerprint: ""
-          # Увеличиваем время ожидания для туннеля
-          command_timeout: 30m
-          proxy_timeout: 30m
-          script_stop: true
+          # Эти параметры не дадут туннелю упасть раньше времени
+          command_timeout: 20m
+          proxy_timeout: 20m
           script: |
             cd ~/monitor_bot
             docker compose down || true
