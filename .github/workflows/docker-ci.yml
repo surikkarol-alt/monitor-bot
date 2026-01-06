@@ -4,7 +4,6 @@ on:
   push:
     branches: ['main']
 
-# Даем права на запись образа, которые ты включил в настройках
 permissions:
   contents: read
   packages: write
@@ -14,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Login to GitHub Container Registry
+      - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -25,7 +24,6 @@ jobs:
         with:
           context: .
           push: true
-          # Используем lowercase для безопасности тегов
           tags: ghcr.io/${{ github.repository_owner }}/monitor-bot:latest
 
   deploy:
@@ -37,12 +35,14 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          # Флаг -T отключает запрос терминала
-          # Флаг -o ConnectTimeout=60 не дает соединению сразу оборваться
-          ssh -T -i ~/.ssh/id_rsa -p 80 -o StrictHostKeyChecking=no -o ConnectTimeout=60 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+          
+          # -T убирает ошибку "Pseudo-terminal will not be allocated"
+          # -o ConnectTimeout дает туннелю время "проснуться"
+          ssh -T -i ~/.ssh/id_rsa -p 80 -o StrictHostKeyChecking=no -o ConnectTimeout=120 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
             cd ~/monitor_bot
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker compose down || true
             docker compose pull
             docker compose up -d
+            docker logout ghcr.io
           EOF
