@@ -28,14 +28,15 @@ jobs:
     needs: build-and-push
     steps:
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.1.0
+        uses: appleboy/ssh-action@master  # или @v1.0.0 и выше, master — самая свежая
         with:
-          host: ${{ secrets.SERVER_HOST }} # Изменил на твоё имя из списка секретов
-          username: ${{ secrets.SERVER_USER }} # Изменил на твоё имя из списка секретов
-          key: ${{ secrets.SSH_PRIVATE_KEY }} # Изменил на твоё имя из списка секретов
-          port: 80
-          fingerprint: ""
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 80  # если порт не 22, укажи правильный, иначе убери строку
+          use_insecure_cipher: true  # <<< КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ для EOF в большинстве случаев
+          fingerprint: ""  # опционально, если нужно проверить host key
           script: |
-            cd ~/monitor_bot
+            cd /monitor_bot
             docker compose pull
             docker compose up -d
