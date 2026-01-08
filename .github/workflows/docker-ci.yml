@@ -1,5 +1,4 @@
 name: Docker CI/CD
-
 on:
   push:
     branches: ['main']
@@ -13,14 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Login to GitHub Container Registry
+      - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -34,21 +31,15 @@ jobs:
     steps:
       - name: Deploy via SSH
         run: |
-          # 1. Подготовка ключа
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           
-          # 2. Подключение и деплой
-          # -T отключает запрос терминала
-          # -o StrictHostKeyChecking=no игнорирует смену адресов туннеля
+          # Мы подключаемся к PORT 80, потому что так работает туннель!
           ssh -T -i ~/.ssh/id_rsa -p 80 -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
             cd ~/monitor_bot
-            # Входим в реестр на ноутбуке
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            # Обновляем контейнеры
             docker compose down || true
             docker compose pull
             docker compose up -d
-            docker logout ghcr.io
           EOF
