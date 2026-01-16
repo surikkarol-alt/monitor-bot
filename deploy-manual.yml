@@ -1,0 +1,27 @@
+name: Manual Deploy to Fly.io
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for deploy"
+        required: false
+        default: "Manual deploy"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Fly.io CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly.io
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          echo "Deploy reason: ${{ github.event.inputs.reason }}"
+          fly deploy --remote-only
