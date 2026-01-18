@@ -1,0 +1,15 @@
+# fly.toml — configuration for monitor-bot (worker app)
+# Generated and cleaned for Fly.io
+
+app = "monitor-bot"
+primary_region = "ams"
+
+[build]
+  dockerfile = "Dockerfile"
+
+# Это НЕ web-приложение, поэтому http_service НЕ нужен
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 1024
