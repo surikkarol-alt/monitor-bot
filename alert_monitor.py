@@ -4,15 +4,17 @@ import os
 import urllib.parse
 import urllib.request
 
+# Путь к лог-файлу
 LOG_FILE = "/app/app.log"
 KEYWORDS = ["ERROR", "CRITICAL"]
 
+# Берём токен и chat_id из переменных окружения (GitHub Secrets / Fly secrets)
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
-COOLDOWN_SECONDS = 30   # анти-спам: 30 секунд
-last_sent = {}          # keyword -> timestamp
-
+# Анти-спам: минимальный интервал между сообщениями для одного ключевого слова
+COOLDOWN_SECONDS = 30
+last_sent = {}  # словарь keyword -> timestamp последнего сообщения
 
 def send_telegram(text: str):
     if not BOT_TOKEN or not CHAT_ID:
@@ -30,15 +32,16 @@ def send_telegram(text: str):
     except Exception as e:
         print("Telegram error:", e)
 
-
 def monitor():
     print("AlertMonitor started...")
 
+    # Ждём, пока появится лог-файл
     while not os.path.exists(LOG_FILE):
         print("Log file not found, waiting...")
         time.sleep(2)
 
     with open(LOG_FILE, "r") as f:
+        # Перемещаемся в конец файла, чтобы читать только новые строки
         f.seek(0, os.SEEK_END)
 
         while True:
@@ -62,4 +65,19 @@ def monitor():
 
 
 if __name__ == "__main__":
-    monitor()
+    import threading
+    import uvicorn
+    import fastapi
+
+    app = fastapi.FastAPI()
+
+    @app.get("/")
+    def root():
+        return {"status": "running"}
+
+    # Запускаем монитор в отдельном потоке
+    t = threading.Thread(target=monitor, daemon=True)
+    t.start()
+
+    # Запускаем HTTP-сервер для Fly
+    uvicorn.run(app, host="0.0.0.0", port=8080)
