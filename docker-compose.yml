@@ -1,13 +1,23 @@
-version: "3.8"
-
 services:
   alert-monitor:
-    build: .
-    container_name: alert-monitor-compose
-    volumes:
-      - ./logs:/app/logs
-    working_dir: /app
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: alert-monitor
+    restart: unless-stopped
+
     env_file:
       - .env
-    command: python3 alert_monitor.py
-    restart: unless-stopped
+
+    volumes:
+      - ./logs:/app/app/logs
+
+    network_mode: host
+
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep '[p]ython.*app.main' > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+      start_interval: 3s

@@ -1,23 +1,15 @@
-# Используем стабильный легковесный образ Python
+# docker/Dockerfile
 FROM python:3.10-slim
 
-# Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем файл зависимостей сначала (оптимизация кэша Docker)
+# Копируем зависимости и исходники
 COPY requirements.txt .
-
-# Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем остальные файлы проекта
-COPY . .
+COPY app ./app
 
-# Гарантируем, что логи Python сразу выводятся в консоль Docker
-ENV PYTHONUNBUFFERED=1
+# Создаём папку для логов внутри контейнера
+RUN mkdir -p /app/app/logs
 
-# Создаем пустой лог-файл (если монитор его ожидает)
-RUN touch /app/app.log
-
-# Запускаем наш монитор
-CMD ["python3", "alert_monitor.py"]
+CMD ["python", "-m", "app.main"]

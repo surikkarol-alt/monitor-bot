@@ -1,9 +1,18 @@
+# Python
 pycache/
 *.pyc
-venv/
+*.pyo
+*.pyd
 .env
-.env.*
-# Docker build artifacts
-*.tar
+venv/
+.venv/
+
 # Logs
+logs/
 *.log
+
+# Docker
+*.tar
+
+# OS
+.DS_Store
