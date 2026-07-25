@@ -7,6 +7,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app /app/app
 
+COPY docker /app/docker
+RUN chmod +x /app/docker/healthcheck.sh
+
 # Устанавливаем procps (нужен для pgrep или ps aux)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends procps && \

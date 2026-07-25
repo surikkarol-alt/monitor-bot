@@ -1,15 +1,11 @@
-# docker/Dockerfile
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Копируем зависимости и исходники
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app ./app
+RUN pip install -r requirements.txt
 
-# Создаём папку для логов внутри контейнера
-RUN mkdir -p /app/app/logs
+COPY bot.py .
 
-CMD ["python", "-m", "app.main"]
+CMD ["python", "bot.py"]

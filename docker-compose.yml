@@ -1,23 +1,21 @@
+version: "3.9"
+
 services:
   alert-monitor:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
+    build: .
     container_name: alert-monitor
-    restart: unless-stopped
-
     env_file:
       - .env
-
     volumes:
-      - ./logs:/app/app/logs
+      - ./app/logs:/app/app/logs
+      - ./state.json:/app/state.json
+    restart: unless-stopped
 
-    network_mode: host
-
-    healthcheck:
-      test: ["CMD-SHELL", "ps aux | grep '[p]ython.*app.main' > /dev/null || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 60s
-      start_interval: 3s
+  test-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: test-service
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
