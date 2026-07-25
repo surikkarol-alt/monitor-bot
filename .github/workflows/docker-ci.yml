@@ -30,7 +30,9 @@ jobs:
         run: flake8 .
 
       - name: Run tests
-        run: pytest
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: pytest 
 
       - name: Build Docker image
         run: docker build -t monitor-bot .
