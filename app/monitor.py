@@ -35,7 +35,7 @@ def monitor():
             try:
                 r = requests.get(url, timeout=2)
                 healthy = r.status_code == 200
-            except:
+            except requests.RequestException:
                 healthy = False
 
             if healthy != previous_status[name]:
