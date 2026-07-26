@@ -1,18 +1,33 @@
 # Python
-pycache/
-*.pyc
+__pycache__/
+*.py[cod]
 *.pyo
-*.pyd
-.env
+
+# Virtual environments
 venv/
 .venv/
 
-# Logs
+# Environment secrets
+.env
+
+# Tests and caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs and runtime state
 logs/
 *.log
+state.json/
+app/state.json
+.container_states/
+.container_status
 
-# Docker
-*.tar
+# Temporary files
+:{{}}~
+test
 
-# OS
+# IDE and OS
+.vscode/
+.idea/
 .DS_Store
