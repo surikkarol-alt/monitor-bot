@@ -1,0 +1,50 @@
+name: Deploy to Oracle VPS
+
+on:
+  workflow_run:
+    workflows:
+      - "CI/CD MonitorBot"
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure SSH
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/oracle_key
+          chmod 600 ~/.ssh/oracle_key
+
+          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Deploy application
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          ssh -i ~/.ssh/oracle_key "$VPS_USER@$VPS_HOST" << 'EOF'
+            set -e
+
+            cd ~/monitor-bot
+            git pull --ff-only origin main
+
+            export PATH="$HOME/.local/bin:$PATH"
+
+            podman-compose down
+            podman-compose up -d --build
+
+            podman ps
+          EOF
