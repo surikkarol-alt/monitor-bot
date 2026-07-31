@@ -1,148 +1,59 @@
-# 🚀 MonitorBot
+# MonitorBot
 
-MonitorBot is a Python application for monitoring Docker containers and sending real-time Telegram notifications.
+MonitorBot is a Python-based monitoring system that checks the availability of a web service and sends Telegram notifications when the service goes DOWN or RECOVERS.
 
-The project demonstrates practical DevOps skills, including Docker, Docker Compose, CI/CD with GitHub Actions, automated testing, and Linux deployment.
+## Features
 
----
+- Service health monitoring
+- Telegram notifications
+- Docker / Podman support
+- GitHub Actions CI
+- Automatic deployment to Oracle Cloud VPS
+- Flask test service
+- Logging
+- Environment configuration with .env
 
-# ✨ Features
+## Project Structure
 
-- 📦 Docker container monitoring
-- 📲 Telegram alerts
-- 🔄 Automatic restart support
-- ❤️ Health checks
-- 🧪 Pytest tests
-- ✔️ Flake8 code quality checks
-- 🚀 GitHub Actions CI/CD
-- 🔐 Environment variables (.env)
+```
+app/
+tests/
+Dockerfile
+docker-compose.yml
+README.md
+```
 
----
-
-# 🛠 Tech Stack
+## Technologies
 
 - Python 3.11
-- Docker
+- Flask
+- Requests
+- Podman
 - Docker Compose
-- Git
-- GitHub
 - GitHub Actions
+- Oracle Cloud VPS
 - Linux
-- Telegram Bot API
+- Git
 
----
+## CI/CD
 
-# 📁 Project Structure
+Every push to the `main` branch:
 
-```text
-monitor_bot/
-├── app/
-│   ├── main.py
-│   ├── monitor.py
-│   ├── telegram.py
-│   ├── config.py
-│   ├── logger.py
-│   ├── health.py
-│   └── ...
-├── tests/
-├── .github/
-│   └── workflows/
-├── Dockerfile
-├── Dockerfile.test
-├── docker-compose.yml
-├── requirements.txt
-├── README.md
-└── .gitignore
+1. Runs flake8
+2. Runs pytest
+3. Builds the container
+4. Publishes the image
+5. Deploys automatically to Oracle Cloud VPS
+
+## Telegram Alerts
+
+Example:
+
+```
+test-service is DOWN
+test-service RECOVERED
 ```
 
----
+## Author
 
-# 🚀 Quick Start
-
-Clone the repository:
-
-```bash
-git clone https://github.com/surikkarol-alt/monitor-bot.git
-cd monitor-bot
-```
-
-Create the environment file:
-
-```bash
-cp .env.example .env
-```
-
-Build the Docker image:
-
-```bash
-docker compose build
-```
-
-Start the project:
-
-```bash
-docker compose up -d
-```
-
----
-
-# 🧪 Run Tests
-
-```bash
-pytest
-```
-
----
-
-# ✔️ Code Quality
-
-```bash
-flake8 .
-```
-
----
-
-# 🐳 Docker
-
-Build image:
-
-```bash
-docker build -t monitorbot .
-```
-
-Run container:
-
-```bash
-docker run monitorbot
-```
-
----
-
-# 🔄 Continuous Integration
-
-Every push to GitHub automatically:
-
-- runs Flake8
-- runs Pytest
-- builds the Docker image
-
-GitHub Actions ensures that the project remains in a working state.
-
----
-
-# 🎯 Future Improvements
-
-- Web dashboard
-- Email notifications
-- Prometheus metrics
-- Grafana dashboards
-- Kubernetes deployment
-
----
-
-# 👨‍💻 Author
-
-Created as a learning and portfolio project while studying Python, Linux, Docker, and DevOps.
-
-GitHub:
-https://github.com/surikkarol-alt
+Sharif
